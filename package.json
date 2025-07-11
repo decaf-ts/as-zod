@@ -1,6 +1,6 @@
 {
-  "name": "@decaf-ts/ts-workspace",
-  "version": "3.9.5",
+  "name": "@decaf-ts/as-zod",
+  "version": "0.0.1",
   "description": "template for ts projects",
   "type": "module",
   "exports": {
@@ -13,7 +13,6 @@
     "update-scripts": "node ./bin/update-scripts.cjs",
     "on-first-run": "node ./bin/update-scripts.cjs --boot",
     "set-git-auth": "git config url.\"https://api:$(cat .token)@github.com/\".insteadOf \"https://github.com/\" && git config url.\"https://ssh:$(cat .token)@github.com/\".insteadOf \"ssh://git@github.com/\" && git config url.\"https://git:$(cat .token)@github.com/\".insteadOf \"git@github.com:\"",
-    "postinstall": "[ -z $CI ] && npm run on-first-run || echo 'CI detected, skipping on-first-run'",
     "flash-forward": "npx npm-check-updates -u && npm run do-install",
     "reset": "rm -rf * && git checkout . && git pull && npm run do-install",
     "build": "node ./bin/build-scripts.cjs --dev",
@@ -35,9 +34,9 @@
     "publish-docs": "docker run -it --rm --user $(id -u):$(id -g) -v \"$(pwd)/workdocs/confluence:/content\" -e ATLASSIAN_API_TOKEN=$(cat .confluence-token) ghcr.io/markdown-confluence/publish:latest",
     "docker:login": "docker login ghcr.io -u $(cat .dockeruser) -p $(cat .dockertoken)",
     "docker:build": "npm run docker:build-base",
-    "docker:build-base": "DOCKER_BUILDKIT=1 docker build --secret id=TOKEN,src=$PWD/.npmtoken -t ghcr.io/decaf-ts/ts-workspace:base-$(cat package.json | jq -r '.version') -t ghcr.io/decaf-ts/ts-workspace:base-${VERSION:-latest} -f ./Dockerfile .",
+    "docker:build-base": "DOCKER_BUILDKIT=1 docker build --secret id=TOKEN,src=$PWD/.npmtoken -t ghcr.io/decaf-ts/as-zod:base-$(cat package.json | jq -r '.version') -t ghcr.io/decaf-ts/as-zod:base-${VERSION:-latest} -f ./Dockerfile .",
     "docker:publish": "npm run docker:publish-base",
-    "docker:publish-base": "docker push ghcr.io/decaf-ts/ts-workspace:base-$(cat package.json | jq -r '.version') && docker push ghcr.io/decaf-ts/ts-workspace:base-${VERSION:-latest}"
+    "docker:publish-base": "docker push ghcr.io/decaf-ts/as-zod:base-$(cat package.json | jq -r '.version') && docker push ghcr.io/decaf-ts/as-zod:base-${VERSION:-latest}"
   },
   "repository": {
     "type": "git",
@@ -73,12 +72,13 @@
     "ts"
   ],
   "author": "Tiago Venceslau",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/decaf-ts/ts-workspace/issues"
   },
   "homepage": "https://github.com/decaf-ts/ts-workspace#readme",
   "devDependencies": {
+    "@decaf-ts/logging": "latest",
+    "@decaf-ts/utils": "latest",
     "@eslint/js": "^9.25.1",
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-json": "^6.1.0",
@@ -109,5 +109,10 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.0"
+  },
+  "peerDependencies": {
+    "@decaf-ts/decorator-validation": "latest",
+    "@decaf-ts/reflection": "latest",
+    "zod": "^4.0.4"
   }
 }
