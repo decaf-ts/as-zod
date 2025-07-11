@@ -1,1 +1,2 @@
-import './overrides';
+import "./model";
+import "./overrides";

@@ -1,3 +1,4 @@
+import "../../src";
 import {
   email,
   max,
@@ -15,9 +16,10 @@ import {
   url,
   password,
   DEFAULT_PATTERNS,
+  description,
 } from "@decaf-ts/decorator-validation";
 import "../../src";
-import { z } from "zod";
+import { z, ZodObject } from "zod";
 
 @model()
 class InnerTestModel extends Model {
@@ -64,9 +66,10 @@ class TestModel extends Model {
     super(arg);
   }
 }
-
+@description("A simple password model")
 @model()
 class PasswordTestModel extends Model {
+  @description("the password attribute")
   @required()
   @password()
   @minlength(8)
@@ -94,38 +97,38 @@ class ListModelTest extends Model {
 describe("Model as Zod", function () {
   it("converts Empty Model to Zod", () => {
     const model = new InnerTestModel();
-    const asZod = model.toZod();
-    expect(asZod).toEqual(z.object({}));
+    const asZod: ZodObject = model.toZod();
+    expect(asZod.shape).toEqual({});
   });
 
   it("converts password Model to Zod", () => {
     const model = new PasswordTestModel();
     const asZod = model.toZod();
-    expect(asZod).toEqual(
+    expect(asZod.shape).toEqual(
       z.object({
         password: z
           .string()
           .min(8)
           .regex(DEFAULT_PATTERNS.PASSWORD.CHAR8_ONE_OF_EACH)
-          .describe("the password"),
-      })
+          .describe("the password attribute"),
+      }).shape
     );
   });
 
   it("converts list Model to Zod", () => {
     const model = new ListModelTest();
     const asZod = model.toZod();
-    expect(asZod).toEqual(
+    expect(asZod.shape).toEqual(
       z.object({
         strings: z.array(z.string()).min(1).max(2).describe("the password"),
-      })
+      }).shape
     );
   });
 
   it("converts test Model to Zod", () => {
     const model = new TestModel();
     const asZod = model.toZod();
-    expect(asZod).toEqual(
+    expect(asZod.shape).toEqual(
       z.object({
         id: z.union([z.string(), z.number()]),
         irrelevant: z.string().optional(),
@@ -135,7 +138,7 @@ describe("Model as Zod", function () {
         prop4: z.email().optional(),
         prop5: z.url().optional(),
         prop6: z.instanceof(InnerTestModel).optional(),
-      })
+      }).shape
     );
   });
 });

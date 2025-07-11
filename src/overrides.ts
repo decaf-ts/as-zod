@@ -82,21 +82,24 @@ Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
       continue;
     }
 
-    const decoratorData = Object.entries(
-      Reflection.getPropertyDecorators(
-        ValidationKeys.REFLECT,
-        this,
-        prop,
-        false,
-        true
-      )
-    ).reduce((accum: Record<string, ValidationMetadata>, [k, meta]) => {
-      meta.forEach(({ key, props }) => {
-        if (accum[key]) throw new Error(`Duplicate decorator: ${key}`);
-        accum[key] = props as ValidationMetadata;
-      });
-      return accum;
-    }, {});
+    const allDecs = Reflection.getPropertyDecorators(
+      ValidationKeys.REFLECT,
+      this,
+      prop,
+      false,
+      true
+    );
+
+    const decoratorData = Object.entries(allDecs).reduce(
+      (accum: Record<string, ValidationMetadata>, [k, meta]) => {
+        meta.forEach(({ key, props }) => {
+          if (accum[key]) throw new Error(`Duplicate decorator: ${key}`);
+          accum[key] = props as ValidationMetadata;
+        });
+        return accum;
+      },
+      {}
+    );
 
     if (!Object.keys(decoratorData).length) {
       continue;
