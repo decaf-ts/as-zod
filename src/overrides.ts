@@ -12,7 +12,6 @@ import {
   StepValidatorOptions,
   PatternValidatorOptions,
   ListMetadata,
-  Constructor,
 } from "@decaf-ts/decorator-validation";
 import { z, ZodAny, ZodObject, ZodRawShape } from "zod";
 import { Reflection } from "@decaf-ts/reflection";

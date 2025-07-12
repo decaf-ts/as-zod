@@ -1,11 +1,12 @@
 [![Banner](./workdocs/assets/Banner.png)](https://decaf-ts.github.io/ts-workspace/)
-## Typescript Template
 
-This repository is meant to provide an enterprise template for any standard Typescript project
+## Decaf-ts as Zod module
+
+Small addon to enable two-way convertion between Models and Zod
 
 
 ![Licence](https://img.shields.io/github/license/decaf-ts/ts-workspace.svg?style=plastic)
-![GitHub language count](https://img.shields.io/github/languages/count/decaf-ts/ts-workspace?style=plastic)
+![GitHub language count](https://img.shields.io/github/languages/count/decaf-ts/as-zod?style=plastic)
 ![GitHub top language](https://img.shields.io/github/languages/top/decaf-ts/ts-workspace?style=plastic)
 
 [![Build & Test](https://github.com/decaf-ts/ts-workspace/actions/workflows/nodejs-build-prod.yaml/badge.svg)](https://github.com/decaf-ts/ts-workspace/actions/workflows/nodejs-build-prod.yaml)
@@ -25,36 +26,26 @@ This repository is meant to provide an enterprise template for any standard Type
 ![Node Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Fbadges%2Fshields%2Fmaster%2Fpackage.json&label=Node&query=$.engines.node&colorB=blue)
 ![NPM Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Fbadges%2Fshields%2Fmaster%2Fpackage.json&label=NPM&query=$.engines.npm&colorB=purple)
 
-Documentation available [here](https://decaf-ts.github.io/ts-workspace/)
+Documentation available [here](https://decaf-ts.github.io/as-zod/)
 
 ### Description
 
-No one needs the hassle of setting up new repos every time.
-
-Now you can create new repositories from this template and enjoy having everything set up for you.
-
-
+Easy two-way conversion from Models to Zod
 
 ### How to Use
 
 - [Initial Setup](./tutorials/For%20Developers.md#_initial-setup_)
 - [Installation](./tutorials/For%20Developers.md#installation)
-- [Scripts](./tutorials/For%20Developers.md#scripts)
-- [Linting](./tutorials/For%20Developers.md#testing)
-- [CI/CD](./tutorials/For%20Developers.md#continuous-integrationdeployment)
-- [Publishing](./tutorials/For%20Developers.md#publishing)
-- [Structure](./tutorials/For%20Developers.md#repository-structure)
-- [IDE Integrations](./tutorials/For%20Developers.md#ide-integrations)
-  - [VSCode(ium)](./tutorials/For%20Developers.md#visual-studio-code-vscode)
-  - [WebStorm](./tutorials/For%20Developers.md#webstorm)
-- [Considerations](./tutorials/For%20Developers.md#considerations)
 
 
 
 
 ### Related
 
-[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=decaf-ts&repo=ts-workspace)](https://github.com/decaf-ts/ts-workspace)
+[![Decorator Validation Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=decaf-ts&repo=decorator-validation)](https://github.com/decaf-ts/decorator-validation)
+
+[![Decaf Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=decaf-ts&repo=decaf-ts)](https://github.com/decaf-ts/decaf-ts)
+
 
 ### Social
 
