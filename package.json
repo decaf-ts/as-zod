@@ -1,7 +1,7 @@
 {
   "name": "@decaf-ts/as-zod",
   "version": "0.0.1",
-  "description": "template for ts projects",
+  "description": "Zod compatibility library",
   "type": "module",
   "exports": {
     "require": "./lib/index.cjs",

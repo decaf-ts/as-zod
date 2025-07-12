@@ -7,12 +7,12 @@ describe("Distribution Tests", () => {
   it("reads lib", () => {
     const {
       VERSION,
-      complexFunction,
-      ChildClass,
+      zodify,
+      zodifyValidation,
     } = require("../../lib/index.cjs");
     expect(VERSION).toEqual(pkg.version);
-    expect(complexFunction).toBeDefined();
-    expect(ChildClass).toBeDefined();
+    expect(zodify).toBeDefined();
+    expect(zodifyValidation).toBeDefined();
   });
 
   it("reads JS Bundle", () => {
@@ -30,11 +30,11 @@ describe("Distribution Tests", () => {
     if (distFile.length === 0)
       throw new Error("There should only be a js file in directory");
 
-    const { VERSION, complexFunction, ChildClass } = require(
+    const { VERSION, zodify, zodifyValidation } = require(
       `../../dist/${distFile[0].name}`
     );
     expect(VERSION).toEqual(pkg.version);
-    expect(complexFunction).toBeDefined();
-    expect(ChildClass).toBeDefined();
+    expect(zodify).toBeDefined();
+    expect(zodifyValidation).toBeDefined();
   });
 });
