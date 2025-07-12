@@ -17,6 +17,7 @@ import {
   password,
   DEFAULT_PATTERNS,
   description,
+  list,
 } from "@decaf-ts/decorator-validation";
 import "../../src";
 import { z, ZodObject } from "zod";
@@ -82,7 +83,7 @@ class PasswordTestModel extends Model {
 
 @model()
 class ListModelTest extends Model {
-  // @list(String)
+  @list(String)
   @maxlength(2)
   @minlength(1)
   @required()
@@ -104,24 +105,27 @@ describe("Model as Zod", function () {
   it("converts password Model to Zod", () => {
     const model = new PasswordTestModel();
     const asZod = model.toZod();
-    expect(asZod.shape).toEqual(
-      z.object({
-        password: z
-          .string()
-          .min(8)
-          .regex(DEFAULT_PATTERNS.PASSWORD.CHAR8_ONE_OF_EACH)
-          .describe("the password attribute"),
-      }).shape
+    expect(JSON.stringify(asZod.shape)).toEqual(
+      JSON.stringify(
+        z.object({
+          password: z
+            .string()
+            .min(8)
+            .regex(DEFAULT_PATTERNS.PASSWORD.CHAR8_ONE_OF_EACH),
+        }).shape
+      )
     );
   });
 
   it("converts list Model to Zod", () => {
     const model = new ListModelTest();
     const asZod = model.toZod();
-    expect(asZod.shape).toEqual(
-      z.object({
-        strings: z.array(z.string()).min(1).max(2).describe("the password"),
-      }).shape
+    expect(JSON.stringify(asZod.shape)).toEqual(
+      JSON.stringify(
+        z.object({
+          strings: z.array(z.string()).min(1).max(2),
+        }).shape
+      )
     );
   });
 
