@@ -12,6 +12,7 @@ import {
   StepValidatorOptions,
   PatternValidatorOptions,
   ListMetadata,
+  Constructor,
 } from "@decaf-ts/decorator-validation";
 import { z, ZodAny, ZodObject, ZodRawShape } from "zod";
 import { Reflection } from "@decaf-ts/reflection";
@@ -48,14 +49,23 @@ export function zodify(type: string | string[], zz: any = ZodAny) {
         return z.set(zz);
       default: {
         const m = Model.get(type);
-        if (!m) throw new Error(`Unzodifiable type: ${type}`);
-        return new m().toZod();
+        if (!m) {
+          throw new Error(`Unzodifiable type: ${type}`);
+        }
+        try {
+          const zz = new m().toZod();
+          return zz;
+        } catch (e: unknown) {
+          throw new Error(`Failed to zodify model ${type}: ${e}`);
+        }
       }
     }
   }
 
   let zod: any;
-  for (const t of type) zod = zod ? zod.or(innerZodify(t)) : innerZodify(t);
+  for (const t of type) {
+    zod = zod ? zod.or(innerZodify(t)) : innerZodify(t);
+  }
 
   return zod;
 }
@@ -109,7 +119,7 @@ Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
   const result: { [key: string]: ZodRawShape } = {};
 
   const properties = Object.getOwnPropertyNames(this);
-  if (Array.isArray(properties)) return z.object({});
+  if (Array.isArray(properties) && !properties.length) return z.object({});
   for (const prop of Object.getOwnPropertyNames(this)) {
     if (
       typeof (this as any)[prop] === "function" ||
