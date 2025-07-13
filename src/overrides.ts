@@ -119,7 +119,7 @@ Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
 
   const properties = Object.getOwnPropertyNames(this);
   if (Array.isArray(properties) && !properties.length) return z.object({});
-  for (const prop of Object.getOwnPropertyNames(this)) {
+  for (const prop of properties) {
     if (
       typeof (this as any)[prop] === "function" ||
       prop.startsWith("_") ||
