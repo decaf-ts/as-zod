@@ -189,3 +189,14 @@ Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
 
   return z.object(result);
 };
+
+Object.defineProperty(z, "fromModel", {
+  value: <M extends Model>(model: Constructor<M>) => {
+    const m = new model();
+    return m.toZod();
+  },
+});
+
+export const Zod: typeof z & {
+  fromModel: <M extends Model>(model: Constructor<M>) => ZodObject;
+} = z;

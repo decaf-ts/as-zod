@@ -12,7 +12,7 @@ import {
   description,
   list,
 } from "@decaf-ts/decorator-validation";
-import "../../src";
+import { Zod } from "../../src";
 import { z, ZodObject } from "zod";
 
 @model()
@@ -115,6 +115,23 @@ describe("Model as Zod", function () {
       JSON.stringify(
         z.object({
           prop: innerZod.optional(),
+        }).shape
+      )
+    );
+  });
+
+  it("can be sourced from Zod", () => {
+    let asZod: any;
+    try {
+      asZod = Zod.fromModel(TestModel);
+    } catch (e: unknown) {
+      throw new Error(`Failed to convert model to zod: ${e}`);
+    }
+
+    expect(JSON.stringify(asZod.shape)).toEqual(
+      JSON.stringify(
+        z.object({
+          prop: z.object({}).optional(),
         }).shape
       )
     );
