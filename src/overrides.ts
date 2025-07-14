@@ -14,7 +14,7 @@ import {
   ListMetadata,
   Constructor,
 } from "@decaf-ts/decorator-validation";
-import { z, ZodAny, ZodObject, ZodRawShape } from "zod";
+import { z, ZodAny, ZodObject } from "zod";
 import { Reflection } from "@decaf-ts/reflection";
 import { ValidationKeys } from "@decaf-ts/decorator-validation";
 
@@ -47,6 +47,10 @@ export function zodify(type: string | string[], zz: any = ZodAny) {
         return z.array(zz);
       case Set.name.toLowerCase():
         return z.set(zz);
+      case Buffer.name.toLowerCase():
+        return z.instanceof(Buffer);
+      case Object.name.toLowerCase():
+        return z.instanceof(Object);
       default: {
         const m = Model.get(type);
         if (!m) {
@@ -204,12 +208,17 @@ const descriptor = Object.getOwnPropertyDescriptor(
 );
 
 if (!descriptor || descriptor.configurable) {
-  Object.defineProperty(z, "fromModel", {
-    value: <M extends Model>(model: Constructor<M>) => {
-      const m = new model();
-      return m.toZod();
-    },
-  });
+  try {
+    Object.defineProperty(z, "fromModel", {
+      value: <M extends Model>(model: Constructor<M>) => {
+        const m = new model();
+        return m.toZod();
+      },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: unknown) {
+    // do nothing
+  }
 }
 
 export { Zod };

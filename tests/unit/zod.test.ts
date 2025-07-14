@@ -59,6 +59,17 @@ class ListModelTest extends Model {
   }
 }
 
+@model()
+export class FileResponseType extends Model {
+  @required()
+  @type([Buffer.name, Object.name])
+  buffer!: Buffer;
+
+  constructor(arg?: ModelArg<FileResponseType>) {
+    super(arg);
+  }
+}
+
 describe("Model as Zod", function () {
   it("converts Empty Model to Zod", () => {
     const model = new InnerTestModel();
@@ -131,6 +142,18 @@ describe("Model as Zod", function () {
       JSON.stringify(
         z.object({
           prop: z.object({}).optional(),
+        }).shape
+      )
+    );
+  });
+
+  it("supports Buffers", () => {
+    const model = new FileResponseType();
+    const asZod = model.toZod();
+    expect(JSON.stringify(asZod.shape)).toEqual(
+      JSON.stringify(
+        z.object({
+          buffer: z.instanceof(Buffer).or(z.instanceof(Object)),
         }).shape
       )
     );
