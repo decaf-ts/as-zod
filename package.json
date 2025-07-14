@@ -1,6 +1,6 @@
 {
   "name": "@decaf-ts/as-zod",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Zod compatibility library",
   "type": "module",
   "exports": {
@@ -16,8 +16,8 @@
     "set-git-auth": "git config url.\"https://api:$(cat .token)@github.com/\".insteadOf \"https://github.com/\" && git config url.\"https://ssh:$(cat .token)@github.com/\".insteadOf \"ssh://git@github.com/\" && git config url.\"https://git:$(cat .token)@github.com/\".insteadOf \"git@github.com:\"",
     "flash-forward": "npx npm-check-updates -u && npm run do-install",
     "reset": "rm -rf * && git checkout . && git pull && npm run do-install",
-    "build": "node ./bin/build-scripts.cjs --dev",
-    "build:prod": "node ./bin/build-scripts.cjs --prod",
+    "build": "npx build-scripts --dev",
+    "build:prod": "npx build-scripts --prod",
     "test": "jest --runInBand --detectOpenHandles",
     "test:unit": "jest --testPathPattern=\"/tests/unit\" --passWithNoTests --detectOpenHandles",
     "test:integration": "jest --testPathPattern=\"/tests/(integration)\" --passWithNoTests --detectOpenHandles",
