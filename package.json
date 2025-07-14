@@ -1,6 +1,6 @@
 {
   "name": "@decaf-ts/as-zod",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Zod compatibility library",
   "type": "module",
   "exports": {
@@ -112,8 +112,8 @@
     "typescript-eslint": "^8.31.0"
   },
   "peerDependencies": {
-    "@decaf-ts/decorator-validation": "^1.7.4",
-    "@decaf-ts/reflection": "^0.4.5",
-    "zod": "^4.0.4"
+    "@decaf-ts/decorator-validation": "latest",
+    "@decaf-ts/reflection": "latest",
+    "zod": "^3.25.76"
   }
 }
