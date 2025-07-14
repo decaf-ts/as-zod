@@ -116,7 +116,7 @@ export function zodifyValidation(
 }
 
 Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
-  const result: { [key: string]: ZodRawShape } = {};
+  const result: { [key: string]: any } = {};
 
   const properties = Object.getOwnPropertyNames(this);
   if (Array.isArray(properties) && !properties.length) return z.object({});
@@ -191,7 +191,19 @@ Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
   return z.object(result);
 };
 
-if (!z["fromModel" as keyof typeof z]) {
+export type ZodFromModel = typeof z & {
+  fromModel: <M extends Model>(model: Constructor<M>) => ZodObject<any>;
+};
+
+// @ts-expect-error overriding type
+const Zod: ZodFromModel = z;
+
+const descriptor = Object.getOwnPropertyDescriptor(
+  Zod,
+  "fromModel" as keyof typeof Zod
+);
+
+if (!descriptor || descriptor.configurable) {
   Object.defineProperty(z, "fromModel", {
     value: <M extends Model>(model: Constructor<M>) => {
       const m = new model();
@@ -200,6 +212,4 @@ if (!z["fromModel" as keyof typeof z]) {
   });
 }
 
-export const Zod: typeof z & {
-  fromModel: <M extends Model>(model: Constructor<M>) => ZodObject;
-} = z;
+export { Zod };
