@@ -14,7 +14,7 @@ import {
   ListMetadata,
   Constructor,
 } from "@decaf-ts/decorator-validation";
-import { z, ZodAny, ZodObject, ZodRawShape } from "zod";
+import { z, ZodAny, ZodObject } from "zod";
 import { Reflection } from "@decaf-ts/reflection";
 import { ValidationKeys } from "@decaf-ts/decorator-validation";
 
@@ -169,9 +169,27 @@ Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
     }
 
     zod = zodify(
-      typeData.customTypes,
+      (Array.isArray(typeData.customTypes)
+        ? typeData.customTypes
+        : [typeData.customTypes]
+      ).map((c) => {
+        if (typeof c === "function") return c();
+        return c;
+      }),
       decoratorData[ValidationKeys.LIST]
-        ? zodify((decoratorData[ValidationKeys.LIST] as ListMetadata).clazz)
+        ? zodify(
+            (Array.isArray(
+              (decoratorData[ValidationKeys.LIST] as ListMetadata).clazz
+            )
+              ? (decoratorData[ValidationKeys.LIST] as ListMetadata).clazz
+              : [(decoratorData[ValidationKeys.LIST] as ListMetadata).clazz]
+            ).map((c) => {
+              if (typeof c === "function") {
+                return c().name;
+              }
+              return c as string;
+            })
+          )
         : ZodAny
     );
 
