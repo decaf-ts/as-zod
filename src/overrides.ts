@@ -115,14 +115,14 @@ export function zodifyValidation(
   }
 }
 
-Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
+export function modelToZod<M extends Model>(model: M) {
   const result: { [key: string]: any } = {};
 
-  const properties = Object.getOwnPropertyNames(this);
+  const properties = Object.getOwnPropertyNames(model);
   if (Array.isArray(properties) && !properties.length) return z.object({});
   for (const prop of properties) {
     if (
-      typeof (this as any)[prop] === "function" ||
+      typeof (model as any)[prop] === "function" ||
       prop.startsWith("_") ||
       prop === "constructor"
     ) {
@@ -131,7 +131,7 @@ Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
 
     const allDecs = Reflection.getPropertyDecorators(
       ValidationKeys.REFLECT,
-      this,
+      model,
       prop,
       false,
       true
@@ -207,7 +207,13 @@ Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
   }
 
   return z.object(result);
+}
+
+Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
+  return modelToZod(this);
 };
+(Model as any).toZod = <M extends Model>(c: Constructor<M>) =>
+  modelToZod(new c());
 
 export type ZodFromModel = typeof z & {
   fromModel: <M extends Model>(model: Constructor<M>) => ZodObject<any>;
