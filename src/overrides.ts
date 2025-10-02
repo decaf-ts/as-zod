@@ -14,7 +14,8 @@ import {
   ListMetadata,
   Constructor,
 } from "@decaf-ts/decorator-validation";
-import { z, ZodAny, ZodObject } from "zod";
+import { Metadata } from "@decaf-ts/decoration";
+import { z, ZodAny } from "zod";
 import { Reflection } from "@decaf-ts/reflection";
 import { ValidationKeys } from "@decaf-ts/decorator-validation";
 
@@ -53,7 +54,7 @@ export function zodify(type: string | string[], zz: any = ZodAny) {
           throw new Error(`Unzodifiable type: ${type}`);
         }
         try {
-          const zz = new m().toZod();
+          const zz = z.from(m);
           return zz;
         } catch (e: unknown) {
           throw new Error(`Failed to zodify model ${type}: ${e}`);
@@ -93,20 +94,14 @@ export function zodifyValidation(
         (values as StepValidatorOptions)[ValidationKeys.STEP]
       );
     case ValidationKeys.PATTERN:
-      return zod.regex(
-        (values as PatternValidatorOptions)[ValidationKeys.PATTERN]
-      );
     case ValidationKeys.URL:
-      return zod.regex(
-        (values as PatternValidatorOptions)[ValidationKeys.PATTERN]
-      );
     case ValidationKeys.EMAIL:
-      return zod.regex(
-        (values as PatternValidatorOptions)[ValidationKeys.PATTERN]
-      );
     case ValidationKeys.PASSWORD:
       return zod.regex(
-        (values as PatternValidatorOptions)[ValidationKeys.PATTERN]
+        new RegExp(
+          (values as PatternValidatorOptions)[ValidationKeys.PATTERN] as string,
+          "g"
+        )
       );
     case ValidationKeys.DATE:
       return zod.date();
@@ -118,7 +113,7 @@ export function zodifyValidation(
 export function modelToZod<M extends Model>(model: M) {
   const result: { [key: string]: any } = {};
 
-  const properties = Object.getOwnPropertyNames(model);
+  const properties = Model.getAttributes(model);
   if (Array.isArray(properties) && !properties.length) return z.object({});
   for (const prop of properties) {
     if (
@@ -203,37 +198,32 @@ export function modelToZod<M extends Model>(model: M) {
       zod = zod.optional();
     }
 
+    const description = Metadata.description(
+      model.constructor as any,
+      prop as any
+    );
+
+    if (description) {
+      zod = zod.describe(description);
+    }
+
     result[prop] = zod;
   }
 
-  return z.object(result);
+  const description = Metadata.description(model.constructor as any);
+  const res = z.object(result);
+  if (description) {
+    res.describe(description);
+  }
+  return res;
 }
 
-Model.prototype.toZod = function <M extends Model>(this: M): ZodObject<any> {
-  return modelToZod(this);
-};
-(Model as any).toZod = <M extends Model>(c: Constructor<M>) =>
-  modelToZod(new c());
-
-export type ZodFromModel = typeof z & {
-  fromModel: <M extends Model>(model: Constructor<M>) => ZodObject<any>;
-};
-
-// @ts-expect-error overriding type
-const Zod: ZodFromModel = z;
-
-const descriptor = Object.getOwnPropertyDescriptor(
-  Zod,
-  "fromModel" as keyof typeof Zod
-);
+const descriptor = Object.getOwnPropertyDescriptor(z, "from" as keyof typeof z);
 
 if (!descriptor || descriptor.configurable) {
-  Object.defineProperty(z, "fromModel", {
+  Object.defineProperty(z, "from", {
     value: <M extends Model>(model: Constructor<M>) => {
-      const m = new model();
-      return m.toZod();
+      return modelToZod(new model()) as any;
     },
   });
 }
-
-export { Zod };
