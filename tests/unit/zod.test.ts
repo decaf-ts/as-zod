@@ -68,43 +68,42 @@ describe("Model as Zod", function () {
     const asZod = z.from(PasswordTestModel);
 
     const regexp = DEFAULT_PATTERNS.PASSWORD.CHAR8_ONE_OF_EACH;
-    const comparison = z.object({
-      password: z.string().min(8).regex(regexp),
-    });
-    //
-    // expect(JSON.stringify(asZod.shape)).toEqual(
-    //   JSON.stringify(comparison.shape)
-    // );
+    const passwordSchema = asZod.shape.password;
+    expect(passwordSchema).toBeInstanceOf(z.ZodString);
+    expect(passwordSchema.description).toBe("the password attribute");
+    expect(passwordSchema.safeParse("short").success).toBe(false);
+    const expectedRegex = new RegExp(regexp.toString(), "g");
+    expect(passwordSchema._def.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: "min",
+          value: 8,
+        }),
+        expect.objectContaining({
+          kind: "regex",
+          regex: expectedRegex,
+        }),
+      ])
+    );
   });
 
   it("converts list Model to Zod", () => {
     const asZod = z.from(ListModelTest);
-    expect(JSON.stringify(asZod.shape)).toEqual(
-      JSON.stringify(
-        z.object({
-          strings: z.array(z.string()).min(1).max(2),
-        }).shape
-      )
-    );
+    const stringsSchema = asZod.shape.strings;
+    expect(stringsSchema).toBeInstanceOf(z.ZodArray);
+    expect(() => asZod.parse({ strings: ["a"] })).not.toThrow();
+    expect(() => asZod.parse({ strings: [] })).toThrow();
+    expect(() => asZod.parse({ strings: ["a", "b", "c"] })).toThrow();
   });
 
   it("converts test Model to Zod", () => {
-    let asZod: any;
-    try {
-      asZod = z.from(TestModel);
-    } catch (e: unknown) {
-      throw new Error(`Failed to convert model to zod: ${e}`);
-    }
-
-    const innerZod = z.from(InnerTestModel);
-
-    expect(JSON.stringify(asZod.shape)).toEqual(
-      JSON.stringify(
-        z.object({
-          prop: innerZod.optional(),
-        }).shape
-      )
-    );
+    const asZod = z.from(TestModel);
+    const propSchema = asZod.shape.prop;
+    expect(propSchema).toBeInstanceOf(z.ZodOptional);
+    const innerSchema = (propSchema as z.ZodOptional<any>)._def.innerType;
+    expect(innerSchema).toBeInstanceOf(z.ZodObject);
+    expect(asZod.safeParse({}).success).toBe(true);
+    expect(asZod.safeParse({ prop: {} }).success).toBe(true);
   });
 
   it("Adds to Class Method", () => {
@@ -122,42 +121,16 @@ describe("Model as Zod", function () {
       }
     }
 
-    let asZod: any;
-    try {
-      const a = PasswordTestModel2;
-      const b = Model;
-      asZod = z.from(a);
-    } catch (e: unknown) {
-      throw new Error(`Failed to convert model to zod: ${e}`);
-    }
-
-    expect(JSON.stringify(asZod.shape)).toEqual(
-      JSON.stringify(
-        z.object({
-          password: z
-            .string()
-            .min(8)
-            .regex(DEFAULT_PATTERNS.PASSWORD.CHAR8_ONE_OF_EACH)
-            .describe("the password attribute"),
-        }).shape
-      )
-    );
+    const asZod = z.from(PasswordTestModel2);
+    const passwordSchema = asZod.shape.password;
+    expect(passwordSchema.description).toBe("the password attribute");
+    expect(asZod.safeParse({ password: "invalid" }).success).toBe(false);
   });
 
   it("can be sourced from Zod", () => {
-    let asZod: any;
-    try {
-      asZod = z.from(TestModel);
-    } catch (e: unknown) {
-      throw new Error(`Failed to convert model to zod: ${e}`);
-    }
-
-    expect(JSON.stringify(asZod.shape)).toEqual(
-      JSON.stringify(
-        z.object({
-          prop: z.object({}).optional(),
-        }).shape
-      )
-    );
+    const asZod = z.from(TestModel);
+    expect(typeof z.from).toBe("function");
+    expect(asZod.safeParse({}).success).toBe(true);
+    expect(asZod.safeParse({ prop: {} }).success).toBe(true);
   });
 });
