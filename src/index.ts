@@ -1,4 +1,6 @@
-export * from "./model";
+import { Metadata } from "@decaf-ts/decoration";
+
+export * from "./zod";
 export * from "./overrides";
 
 /**
@@ -8,3 +10,5 @@ export * from "./overrides";
  * @memberOf module:as-zod
  */
 export const VERSION = "##VERSION##";
+
+Metadata.registerLibrary("@decaf-ts/as-zod", VERSION);

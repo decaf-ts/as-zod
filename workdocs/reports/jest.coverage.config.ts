@@ -3,6 +3,8 @@ import conf from "../../jest.config";
 
 const config: Config.InitialOptions = {
   ...conf,
+  watchman: false,
+  maxWorkers: 1,
   collectCoverage: true,
   coverageDirectory: "./workdocs/reports/coverage",
   reporters: [
