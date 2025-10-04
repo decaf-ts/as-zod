@@ -23,7 +23,7 @@ const config: Config.InitialOptions = {
         filename: "test-report.html",
         openReport: true,
         expand: true,
-        pageTitle: "Decaf's 'as Zod' Test Report",
+        pageTitle: "@decaf-ts/as-zod",
         stripSkippedTest: true,
         darkTheme: true,
         enableMergeData: true,
