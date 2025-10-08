@@ -80,7 +80,7 @@
     "typescript",
     "ts"
   ],
-  "author": "Tiago Venceslau",
+  "author": "Tiago Venceslau and Contributors",
   "bugs": {
     "url": "https://github.com/decaf-ts/ts-workspace/issues"
   },
@@ -124,5 +124,6 @@
     "@decaf-ts/decorator-validation": "latest",
     "@decaf-ts/reflection": "latest",
     "zod": "^3.25.76"
-  }
+  },
+  "license": "MIT"
 }

@@ -223,7 +223,9 @@ const descriptor = Object.getOwnPropertyDescriptor(z, "from" as keyof typeof z);
 if (!descriptor || descriptor.configurable) {
   Object.defineProperty(z, "from", {
     value: <M extends Model>(model: Constructor<M>) => {
-      return modelToZod(new model()) as any;
+      const m = new model();
+      if (!Metadata.constr(m.constructor as any)) Model.fromModel(m, {});
+      return modelToZod(m) as any;
     },
   });
 }
