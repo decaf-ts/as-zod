@@ -60,7 +60,7 @@ class ListModelTest extends Model {
 
 describe("Model as Zod", function () {
   it("converts Empty Model to Zod", () => {
-    const asZod: ZodObject<any> = z.from(InnerTestModel);
+    const asZod = z.from(InnerTestModel);
     expect(asZod.shape).toEqual(z.object({}).shape);
   });
 
