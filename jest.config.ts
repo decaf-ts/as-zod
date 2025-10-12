@@ -11,6 +11,7 @@ const config: Config.InitialOptions = {
   coverageDirectory: "./workdocs/reports/coverage",
   collectCoverageFrom: ["src/**/*.{js,jsx,ts,tsx}", "!src/bin/**/*"],
   reporters: ["default"],
+  watchman: false,
 };
 
 export default config;

@@ -37,28 +37,6 @@ Easy two-way conversion from Models to Zod
 - [Initial Setup](./workdocs/tutorials/For%20Developers.md#_initial-setup_)
 - [Installation](./workdocs/tutorials/For%20Developers.md#installation)
 
-#### Type inference examples
-
-- Basic model
-  - `@model()`
-  - `class TestModel extends Model { @required() @minlength(3) @description("this is a description") name!: string }`
-  - `const s = z.from(TestModel)` → `z.infer<typeof s>` is `{ name: string }`
-
-- Nested model
-  - `class A extends Model { @required() n!: number }`
-  - `class B extends Model { @type(A.name) a?: A }`
-  - `const s = z.from(B)` → `z.infer<typeof s>` is `{ a?: { n: number } }`
-
-- Collections
-  - Arrays: `class L extends Model { @list(A) items!: A[] }` → `{ items: { n: number }[] }`
-  - Sets: `class S extends Model { @list(A) items!: Set<A> }` → `{ items: Set<{ n: number }> }`
-
-- Optional/nullable
-  - `prop?: string` → `ZodOptional<ZodString>`
-  - `prop: string | null` → `ZodNullable<ZodString>`
-
-Note: TypeScript can’t read decorator metadata at type level; annotate properties with their element types (e.g., `A[]`, `Set<A>`). If needed, use helpers `ListOf<T>` and `SetOf<T>` from `src/zod.ts` to make element types explicit.
-
 
 
 

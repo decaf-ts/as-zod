@@ -22,6 +22,7 @@ import { ValidationKeys } from "@decaf-ts/decorator-validation";
 const ReservedKeys = [
   ValidationKeys.REQUIRED,
   ValidationKeys.TYPE,
+  ValidationKeys.DATE,
   ModelKeys.TYPE,
 ] as const;
 
@@ -46,8 +47,17 @@ export function zodify(type: string | string[], zz: any = ZodAny) {
         return z.date();
       case Array.name.toLowerCase():
         return z.array(zz);
-      case Set.name.toLowerCase():
-        return z.set(zz);
+      case Set.name.toLowerCase(): {
+        const setSchema = z.set(zz);
+        if (typeof (setSchema as any).valueSchema === "undefined") {
+          Object.defineProperty(setSchema, "valueSchema", {
+            get: () => (setSchema as any)._def?.valueType,
+            enumerable: false,
+            configurable: true,
+          });
+        }
+        return setSchema;
+      }
       default: {
         const m = Model.get(type);
         if (!m) {
@@ -104,7 +114,8 @@ export function zodifyValidation(
         )
       );
     case ValidationKeys.DATE:
-      return zod.date();
+      // DATE decorator is handled via @type(Date) and parsing; do not re-wrap here
+      throw new TypeError("DATE validator cannot be applied as a refinement");
     default:
       return zod;
   }
@@ -212,10 +223,7 @@ export function modelToZod<M extends Model>(model: M) {
 
   const description = Metadata.description(model.constructor as any);
   const res = z.object(result);
-  if (description) {
-    res.describe(description);
-  }
-  return res;
+  return description ? res.describe(description) : res;
 }
 
 const descriptor = Object.getOwnPropertyDescriptor(z, "from" as keyof typeof z);

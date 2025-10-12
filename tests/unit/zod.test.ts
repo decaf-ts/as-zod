@@ -12,7 +12,7 @@ import {
   list,
 } from "@decaf-ts/decorator-validation";
 import { description } from "@decaf-ts/decoration";
-import { z, ZodObject } from "zod";
+import { z } from "zod";
 
 @model()
 class InnerTestModel extends Model {

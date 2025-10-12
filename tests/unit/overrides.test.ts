@@ -20,11 +20,7 @@ import {
 import { description } from "@decaf-ts/decoration";
 import { Reflection } from "@decaf-ts/reflection";
 import { z } from "zod";
-import {
-  modelToZod,
-  zodify,
-  zodifyValidation,
-} from "../../src/overrides";
+import { modelToZod, zodify, zodifyValidation } from "../../src/overrides";
 
 describe("zodify", () => {
   it("creates schemas for primitives, containers, and unions", () => {
@@ -58,6 +54,7 @@ describe("zodify", () => {
 
   it("maps registered models and reports errors", () => {
     @model()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     class BasicModel extends Model {
       constructor(arg?: ModelArg<BasicModel>) {
         super(arg);
@@ -74,6 +71,7 @@ describe("zodify", () => {
 
   it("wraps conversion failures from model instances", () => {
     @model()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     class ExplodingModel extends Model {
       constructor() {
         super();
@@ -89,23 +87,15 @@ describe("zodify", () => {
 
 describe("zodifyValidation", () => {
   it("applies numeric and length constraints", () => {
-    const minSchema = zodifyValidation(
-      z.number(),
-      ValidationKeys.MIN,
-      {
-        [ValidationKeys.MIN]: 3,
-      } as MinValidatorOptions
-    );
+    const minSchema = zodifyValidation(z.number(), ValidationKeys.MIN, {
+      [ValidationKeys.MIN]: 3,
+    } as MinValidatorOptions);
     expect(minSchema.safeParse(4).success).toBe(true);
     expect(minSchema.safeParse(2).success).toBe(false);
 
-    const maxSchema = zodifyValidation(
-      z.number(),
-      ValidationKeys.MAX,
-      {
-        [ValidationKeys.MAX]: 10,
-      } as MaxValidatorOptions
-    );
+    const maxSchema = zodifyValidation(z.number(), ValidationKeys.MAX, {
+      [ValidationKeys.MAX]: 10,
+    } as MaxValidatorOptions);
     expect(maxSchema.safeParse(11).success).toBe(false);
 
     const minLengthSchema = zodifyValidation(
@@ -128,33 +118,21 @@ describe("zodifyValidation", () => {
   });
 
   it("applies step, pattern, and delegated validators", () => {
-    const stepSchema = zodifyValidation(
-      z.number(),
-      ValidationKeys.STEP,
-      {
-        [ValidationKeys.STEP]: 2,
-      } as StepValidatorOptions
-    );
+    const stepSchema = zodifyValidation(z.number(), ValidationKeys.STEP, {
+      [ValidationKeys.STEP]: 2,
+    } as StepValidatorOptions);
     expect(stepSchema.safeParse(6).success).toBe(true);
     expect(stepSchema.safeParse(7).success).toBe(false);
 
-    const patternSchema = zodifyValidation(
-      z.string(),
-      ValidationKeys.PATTERN,
-      {
-        [ValidationKeys.PATTERN]: "^test$",
-      } as PatternValidatorOptions
-    );
+    const patternSchema = zodifyValidation(z.string(), ValidationKeys.PATTERN, {
+      [ValidationKeys.PATTERN]: "^test$",
+    } as PatternValidatorOptions);
     expect(patternSchema.safeParse("test").success).toBe(true);
     expect(patternSchema.safeParse("tester").success).toBe(false);
 
-    const emailSchema = zodifyValidation(
-      z.string(),
-      ValidationKeys.EMAIL,
-      {
-        [ValidationKeys.PATTERN]: "^.+@example\\.com$",
-      } as PatternValidatorOptions
-    );
+    const emailSchema = zodifyValidation(z.string(), ValidationKeys.EMAIL, {
+      [ValidationKeys.PATTERN]: "^.+@example\\.com$",
+    } as PatternValidatorOptions);
     expect(emailSchema.safeParse("user@example.com").success).toBe(true);
     expect(emailSchema.safeParse("user@elsewhere.com").success).toBe(false);
   });
@@ -268,19 +246,21 @@ describe("modelToZod", () => {
     const original = Reflection.getPropertyDecorators.bind(Reflection);
     const skipSpy = jest
       .spyOn(Reflection, "getPropertyDecorators")
-      .mockImplementation((prefix, target, property, ignoreType, recursive, accumulator) => {
-        if (property === "ignored") {
-          return { prop: "ignored", decorators: [] } as any;
+      .mockImplementation(
+        (prefix, target, property, ignoreType, recursive, accumulator) => {
+          if (property === "ignored") {
+            return { prop: "ignored", decorators: [] } as any;
+          }
+          return original(
+            prefix,
+            target,
+            property,
+            ignoreType as boolean | undefined,
+            recursive as boolean | undefined,
+            accumulator
+          );
         }
-        return original(
-          prefix,
-          target,
-          property,
-          ignoreType as boolean | undefined,
-          recursive as boolean | undefined,
-          accumulator
-        );
-      });
+      );
 
     const schema = modelToZod(new IgnoredPropertyModel());
     expect(schema.shape).toHaveProperty("included");
@@ -319,10 +299,7 @@ describe("modelToZod", () => {
       }
     }
 
-    const reflectionSpy = jest.spyOn(
-      Reflection,
-      "getPropertyDecorators"
-    );
+    const reflectionSpy = jest.spyOn(Reflection, "getPropertyDecorators");
     reflectionSpy.mockReturnValue({
       prop: "field",
       decorators: [
