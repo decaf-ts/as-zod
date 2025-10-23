@@ -73,15 +73,19 @@ describe("Model as Zod", function () {
     expect(passwordSchema.description).toBe("the password attribute");
     expect(passwordSchema.safeParse("short").success).toBe(false);
     const expectedRegex = new RegExp(regexp.toString(), "g");
-    expect(passwordSchema._def.checks).toEqual(
+    const passwordChecks = passwordSchema._def.checks.map(
+      (check: any) => check?._zod?.def
+    );
+    expect(passwordChecks).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          kind: "min",
-          value: 8,
+          check: "min_length",
+          minimum: 8,
         }),
         expect.objectContaining({
-          kind: "regex",
-          regex: expectedRegex,
+          check: "string_format",
+          format: "regex",
+          pattern: expectedRegex,
         }),
       ])
     );

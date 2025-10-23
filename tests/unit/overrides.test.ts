@@ -41,7 +41,7 @@ describe("zodify", () => {
 
     const arraySchema = zodify("array", z.string());
     expect(arraySchema).toBeInstanceOf(z.ZodArray);
-    expect(arraySchema._def.type).toBeInstanceOf(z.ZodString);
+    expect(arraySchema.element).toBeInstanceOf(z.ZodString);
 
     const setSchema = zodify("set", z.number());
     expect(setSchema).toBeInstanceOf(z.ZodSet);
@@ -207,7 +207,7 @@ describe("modelToZod", () => {
     expect(tags).toBeInstanceOf(z.ZodOptional);
     const tagArray = (tags as z.ZodOptional<any>)._def.innerType;
     expect(tagArray).toBeInstanceOf(z.ZodArray);
-    const tagSchema = tagArray._def.type;
+    const tagSchema = tagArray.element;
     expect(tagSchema).toBeInstanceOf(z.ZodString);
 
     const children = shape.children;

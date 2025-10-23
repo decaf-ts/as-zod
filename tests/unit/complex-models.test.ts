@@ -137,57 +137,85 @@ describe("Model as Zod with complex models", () => {
       schema.shape;
 
     expect(code.description).toBe("unique code");
-    const codeChecks = (code as z.ZodString)._def.checks;
+    const codeChecks = (code as z.ZodString)._def.checks.map(
+      (check: any) => check?._zod?.def
+    );
     expect(codeChecks).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ kind: "min", value: 6 }),
-        expect.objectContaining({ kind: "max", value: 6 }),
-        expect.objectContaining({ kind: "regex" }),
+        expect.objectContaining({ check: "min_length", minimum: 6 }),
+        expect.objectContaining({ check: "max_length", maximum: 6 }),
+        expect.objectContaining({ check: "string_format", format: "regex" }),
       ])
     );
 
     expect(score.description).toBe("scored number");
-    const numberChecks = (score as z.ZodNumber)._def.checks;
+    const numberChecks = (score as z.ZodNumber)._def.checks.map(
+      (check: any) => check?._zod?.def
+    );
     expect(numberChecks).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ kind: "min", value: 0 }),
-        expect.objectContaining({ kind: "max", value: 100 }),
-        expect.objectContaining({ kind: "multipleOf", value: 5 }),
+        expect.objectContaining({
+          check: "greater_than",
+          value: 0,
+          inclusive: true,
+        }),
+        expect.objectContaining({
+          check: "less_than",
+          value: 100,
+          inclusive: true,
+        }),
+        expect.objectContaining({ check: "multiple_of", value: 5 }),
       ])
     );
 
     expect(launchDate.description).toBe("launch date");
     expect(launchDate).toBeInstanceOf(z.ZodDate);
-    const dateChecks = (launchDate as z.ZodDate)._def.checks;
+    const dateChecks = (launchDate as z.ZodDate)._def.checks.map(
+      (check: any) => check?._zod?.def
+    );
     expect(dateChecks).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          kind: "min",
-          value: new Date("2022-01-01").getTime(),
+          check: "greater_than",
+          value: new Date("2022-01-01T00:00:00.000Z"),
+          inclusive: true,
         }),
         expect.objectContaining({
-          kind: "max",
-          value: new Date("2030-12-31").getTime(),
+          check: "less_than",
+          value: new Date("2030-12-31T00:00:00.000Z"),
+          inclusive: true,
         }),
       ])
     );
 
     expect(contactEmail.description).toBe("contact email");
-    const emailChecks = (contactEmail as z.ZodString)._def.checks;
+    const emailChecks = (contactEmail as z.ZodString)._def.checks.map(
+      (check: any) => check?._zod?.def
+    );
     expect(emailChecks).toEqual(
-      expect.arrayContaining([expect.objectContaining({ kind: "regex" })])
+      expect.arrayContaining([
+        expect.objectContaining({ check: "string_format", format: "regex" }),
+      ])
     );
 
     expect(homepage.description).toBe("homepage url");
-    const urlChecks = (homepage as z.ZodString)._def.checks;
+    const urlChecks = (homepage as z.ZodString)._def.checks.map(
+      (check: any) => check?._zod?.def
+    );
     expect(urlChecks).toEqual(
-      expect.arrayContaining([expect.objectContaining({ kind: "regex" })])
+      expect.arrayContaining([
+        expect.objectContaining({ check: "string_format", format: "regex" }),
+      ])
     );
 
     expect(secret.description).toBe("account password");
-    const passwordChecks = (secret as z.ZodString)._def.checks;
+    const passwordChecks = (secret as z.ZodString)._def.checks.map(
+      (check: any) => check?._zod?.def
+    );
     expect(passwordChecks).toEqual(
-      expect.arrayContaining([expect.objectContaining({ kind: "regex" })])
+      expect.arrayContaining([
+        expect.objectContaining({ check: "string_format", format: "regex" }),
+      ])
     );
   });
 
@@ -213,7 +241,7 @@ describe("Model as Zod with complex models", () => {
     expect(primaryAddress).toBeInstanceOf(z.ZodObject);
 
     expect(addressHistory).toBeInstanceOf(z.ZodArray);
-    const addressElement = (addressHistory as z.ZodArray<any>)._def.type;
+    const addressElement = (addressHistory as z.ZodArray<any>).element;
     expect(addressElement).toBeInstanceOf(z.ZodObject);
 
     expect(preferenceSet).toBeInstanceOf(z.ZodSet);
@@ -221,7 +249,7 @@ describe("Model as Zod with complex models", () => {
     expect(setValueSchema).toBeInstanceOf(z.ZodObject);
 
     expect(relatedItems).toBeInstanceOf(z.ZodArray);
-    const relatedElement = (relatedItems as z.ZodArray<any>)._def.type;
+    const relatedElement = (relatedItems as z.ZodArray<any>).element;
     expect(relatedElement).toBeInstanceOf(z.ZodUnion);
 
     expect(isActive).toBeInstanceOf(z.ZodOptional);

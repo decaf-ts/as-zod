@@ -123,7 +123,7 @@
     "@decaf-ts/decoration": "latest",
     "@decaf-ts/decorator-validation": "latest",
     "@decaf-ts/reflection": "latest",
-    "zod": "^3.25.76"
+    "zod": "^4.1.12"
   },
   "license": "MIT"
 }
