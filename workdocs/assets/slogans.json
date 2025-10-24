@@ -1,0 +1,176 @@
+[
+  {
+    "Slogan": "as-zod: Turn your models into schemas without turning your code into chaos.",
+    "Tags": "Zod, Validation, Calm"
+  },
+  {
+    "Slogan": "Bridge your data types to runtime safety — decaf style.",
+    "Tags": "Zod, TypeSafety, Coffee-themed"
+  },
+  {
+    "Slogan": "Your TypeScript types deserve more than caffeine-fuelled runtime surprises.",
+    "Tags": "Typescript, Zod, Humor"
+  },
+  {
+    "Slogan": "From model to schema in one smooth sip.",
+    "Tags": "Zod, Workflow, Coffee-themed"
+  },
+  {
+    "Slogan": "Validate with confidence. Relaxed heart-rate included.",
+    "Tags": "Validation, Calm, Developer"
+  },
+  {
+    "Slogan": "as-zod: Because your code should parse data, not your blood pressure.",
+    "Tags": "Zod, Humor, Calm"
+  },
+  {
+    "Slogan": "Schema generation + type inference = less caffeine, more clarity.",
+    "Tags": "Inference, Zod, Coffee-themed"
+  },
+  {
+    "Slogan": "Make invalid data walk the plank while you sip decaf.",
+    "Tags": "Validation, Fun, Coffee-themed"
+  },
+  {
+    "Slogan": "From safeParse to sleep at night.",
+    "Tags": "Zod, Relaxation, Developer"
+  },
+  {
+    "Slogan": "as-zod: your model’s barista for brewing schema definitions.",
+    "Tags": "Zod, Metaphor, Coffee-themed"
+  },
+  {
+    "Slogan": "as-zod: now with 30% more chill and 70% fewer bugs.",
+    "Tags": "Validation, Calm, Humor"
+  },
+  {
+    "Slogan": "Zod schemas so smooth, they autocorrect your stress.",
+    "Tags": "Zod, Developer, Fun"
+  },
+  {
+    "Slogan": "Runtime validation that won't trigger your fight-or-flight.",
+    "Tags": "Zod, Calm, Developer"
+  },
+  {
+    "Slogan": "Code serenity now. Errors later. Maybe.",
+    "Tags": "Zod, Humor, DevX"
+  },
+  {
+    "Slogan": "Zod your types without sacrificing your sanity.",
+    "Tags": "TypeSafety, Developer, Chill"
+  },
+  { "Slogan": "From TS model to runtime zen.", "Tags": "Calm, Zod, Workflow" },
+  {
+    "Slogan": "Decaf the validation process.",
+    "Tags": "Coffee-themed, Developer, Chill"
+  },
+  {
+    "Slogan": "Less runtime panic. More compile-time tea time.",
+    "Tags": "TypeScript, Humor, Calm"
+  },
+  {
+    "Slogan": "Safely parse like a sleepy ninja.",
+    "Tags": "Zod, Fun, Developer"
+  },
+  {
+    "Slogan": "Parse responsibly. Type enthusiastically.",
+    "Tags": "Validation, Types, Humor"
+  },
+  {
+    "Slogan": "Zod schemas that don’t need a therapist afterward.",
+    "Tags": "Zod, Developer, Humor"
+  },
+  {
+    "Slogan": "Coffee in the mug. Types in the schema. Zen in the soul.",
+    "Tags": "Coffee-themed, Zod, Calm"
+  },
+  {
+    "Slogan": "Schema validation without heart palpitations.",
+    "Tags": "Validation, Calm, Tech"
+  },
+  {
+    "Slogan": "Your runtime checks deserve spa day energy.",
+    "Tags": "Zod, Humor, Developer"
+  },
+  {
+    "Slogan": "Skip the caffeine jitters. Keep the type safety.",
+    "Tags": "Zod, TypeSafety, Coffee-themed"
+  },
+  {
+    "Slogan": "Infer types like a boss. Validate like a monk.",
+    "Tags": "Developer, Zod, Humor"
+  },
+  { "Slogan": "Zod-powered. Jitter-free.", "Tags": "Coffee-themed, Zod, Fun" },
+  {
+    "Slogan": "as-zod: because schemas don’t need to scream.",
+    "Tags": "Validation, Calm, Humor"
+  },
+  {
+    "Slogan": "Type-safe and coffee-safe.",
+    "Tags": "Zod, Coffee-themed, Developer"
+  },
+  {
+    "Slogan": "Errors handled with a gentle sigh.",
+    "Tags": "Calm, Developer, Zod"
+  },
+  {
+    "Slogan": "Chill out. Your data’s valid.",
+    "Tags": "Validation, Humor, Coffee-themed"
+  },
+  {
+    "Slogan": "Don't just type. Decaf-type.",
+    "Tags": "Typescript, Calm, Humor"
+  },
+  { "Slogan": "Types. Schemas. Less drama.", "Tags": "Zod, TypeSafety, Calm" },
+  {
+    "Slogan": "Infer everything. Panic about nothing.",
+    "Tags": "Inference, Calm, Developer"
+  },
+  {
+    "Slogan": "Zod with the calmness of a sleeping golden retriever.",
+    "Tags": "Zod, Humor, Developer"
+  },
+  {
+    "Slogan": "Because a failed parse shouldn’t ruin your lunch.",
+    "Tags": "Validation, Humor, Zod"
+  },
+  {
+    "Slogan": "Catch bad data. Release good vibes.",
+    "Tags": "Validation, Chill, Developer"
+  },
+  {
+    "Slogan": "Write once, validate forever.",
+    "Tags": "Developer, Zod, Coffee-themed"
+  },
+  {
+    "Slogan": "Schemas that let you sleep better at night.",
+    "Tags": "Validation, Calm, Sleep"
+  },
+  { "Slogan": "From unparsed to unperturbed.", "Tags": "Zod, Calm, Developer" },
+  {
+    "Slogan": "Compile-time cuddles, runtime hugs.",
+    "Tags": "Types, Humor, Developer"
+  },
+  {
+    "Slogan": "Get your schema straight — no coffee required.",
+    "Tags": "Zod, Coffee-themed, Humor"
+  },
+  { "Slogan": "Keep calm and infer on.", "Tags": "Inference, Calm, Humor" },
+  {
+    "Slogan": "as-zod: For devs who love types and loathe chaos.",
+    "Tags": "Zod, Calm, TypeSafety"
+  },
+  {
+    "Slogan": "Take a breath. Now validate.",
+    "Tags": "Developer, Calm, Validation"
+  },
+  { "Slogan": "Zodify like it's a lazy Sunday.", "Tags": "Zod, Chill, Fun" },
+  {
+    "Slogan": "Let your schemas meditate.",
+    "Tags": "Calm, Decorators, Validation"
+  },
+  {
+    "Slogan": "A fresh pot of types, every parse.",
+    "Tags": "Coffee-themed, Zod, Developer"
+  }
+]
