@@ -1,4 +1,4 @@
-[![Banner](./workdocs/assets/Banner.png)](https://decaf-ts.github.io/ts-workspace/)
+![Banner](./workdocs/assets/decaf-logo.svg)
 
 ## Decaf-ts as Zod module
 
