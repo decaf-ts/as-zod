@@ -1,9 +1,8 @@
-[![Banner](./workdocs/assets/Banner.png)](https://decaf-ts.github.io/ts-workspace/)
+![Banner](./workdocs/assets/decaf-logo.svg)
 
 ## Decaf-ts as Zod module
 
 Small addon to enable two-way convertion between Models and Zod
-
 
 ![Licence](https://img.shields.io/github/license/decaf-ts/ts-workspace.svg?style=plastic)
 ![GitHub language count](https://img.shields.io/github/languages/count/decaf-ts/as-zod?style=plastic)
@@ -28,6 +27,9 @@ Small addon to enable two-way convertion between Models and Zod
 
 Documentation available [here](https://decaf-ts.github.io/as-zod/)
 
+Minimal size: 1.3 KB kb gzipped
+
+
 ### Description
 
 Easy two-way conversion from Models to Zod
@@ -40,6 +42,24 @@ versions `^0.0.1` are for zod 3.x. `^1.0.0` for zod 4.x
 - [Installation](./workdocs/tutorials/For%20Developers.md#installation)
 
 
+
+
+## Coding Principles
+
+- group similar functionality in folders (analog to namespaces but without any namespace declaration)
+- one class per file;
+- one interface per file (unless interface is just used as a type);
+- group types as other interfaces in a types.ts file per folder;
+- group constants or enums in a constants.ts file per folder;
+- group decorators in a decorators.ts file per folder;
+- always import from the specific file, never from a folder or index file (exceptions for dependencies on other packages);
+- prefer the usage of established design patters where applicable:
+  - Singleton (can be an anti-pattern. use with care);
+  - factory;
+  - observer;
+  - strategy;
+  - builder;
+  - etc;
 
 
 ### Related
