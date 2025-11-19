@@ -69,19 +69,21 @@ describe("zodify", () => {
     );
   });
 
-  it("wraps conversion failures from model instances", () => {
+  it("converts models without instantiating constructors", () => {
+    let constructed = false;
     @model()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     class ExplodingModel extends Model {
       constructor() {
         super();
+        constructed = true;
         throw new Error("Explosion");
       }
     }
 
-    expect(() => zodify("ExplodingModel")).toThrow(
-      /Failed to zodify model ExplodingModel: Error: Explosion/
-    );
+    const schema = zodify("ExplodingModel");
+    expect(schema).toBeInstanceOf(z.ZodObject);
+    expect(constructed).toBe(false);
   });
 });
 
