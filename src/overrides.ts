@@ -1,5 +1,7 @@
 import {
   Model,
+  ModelBuilder,
+  AttributeBuilder,
   ModelKeys,
   TypeMetadata,
   Primitives,
@@ -12,11 +14,10 @@ import {
   StepValidatorOptions,
   PatternValidatorOptions,
   ListMetadata,
-  Constructor,
+  ExtendedMetadata,
 } from "@decaf-ts/decorator-validation";
-import { Metadata } from "@decaf-ts/decoration";
+import { Metadata, Constructor } from "@decaf-ts/decoration";
 import { z, ZodAny } from "zod";
-import { Reflection } from "@decaf-ts/reflection";
 import { ValidationKeys } from "@decaf-ts/decorator-validation";
 
 const ReservedKeys = [
@@ -28,6 +29,203 @@ const ReservedKeys = [
 
 function isReservedKey(el: string) {
   return ReservedKeys.includes(el as any);
+}
+
+type DecoratorData = Record<string, any>;
+
+class ZodAttributeBuilder<
+  M extends Model,
+  N extends keyof M,
+> extends AttributeBuilder<M, N, Constructor | undefined> {
+  private readonly decoratorData: DecoratorData;
+  private readonly attributeDescription?: string;
+
+  constructor(
+    parent: ModelBuilder<M>,
+    attr: N,
+    declaredType: Constructor | undefined,
+    decoratorData: DecoratorData,
+    description?: string
+  ) {
+    super(parent, attr, declaredType as Constructor | undefined);
+    this.decoratorData = decoratorData;
+    this.attributeDescription = description;
+  }
+
+  private safeInvoke(value: unknown) {
+    if (typeof value !== "function") {
+      return value;
+    }
+    if ((value as { prototype?: unknown }).prototype) {
+      return value;
+    }
+    try {
+      return (value as () => unknown)();
+    } catch {
+      return value;
+    }
+  }
+
+  private typeName(value: unknown): string {
+    if (typeof value === "string") {
+      return value;
+    }
+    if (typeof value === "function") {
+      return value.name || value.toString();
+    }
+    if (value && typeof value === "object" && "name" in (value as any)) {
+      const name = (value as { name?: string }).name;
+      if (name) return name;
+    }
+    return String(value);
+  }
+
+  private normalizeTypes(input: TypeMetadata["customTypes"]): string[] {
+    const asArray = Array.isArray(input) ? input : [input];
+    return asArray.map((entry) => {
+      const resolved = this.safeInvoke(entry);
+      return this.typeName(resolved);
+    });
+  }
+
+  private resolveListTypes(listMeta: ListMetadata) {
+    const classes = Array.isArray(listMeta.clazz)
+      ? listMeta.clazz
+      : [listMeta.clazz];
+    return classes.map((clazz) => {
+      const resolved = this.safeInvoke(clazz);
+      return this.typeName(resolved);
+    });
+  }
+
+  buildSchema() {
+    if (!Object.keys(this.decoratorData).length) {
+      return undefined;
+    }
+
+    const typeData = this.decoratorData[ValidationKeys.TYPE] as
+      | TypeMetadata
+      | undefined;
+
+    if (!typeData) {
+      throw new Error(`Missing type information`);
+    }
+
+    let zodSchema = zodify(
+      this.normalizeTypes(typeData.customTypes),
+      this.decoratorData[ValidationKeys.LIST]
+        ? zodify(
+            this.resolveListTypes(
+              this.decoratorData[ValidationKeys.LIST] as ListMetadata
+            )
+          )
+        : ZodAny
+    );
+
+    for (const [key, props] of Object.entries(this.decoratorData).filter(
+      ([k]) => !isReservedKey(k)
+    )) {
+      zodSchema = zodifyValidation(zodSchema, key, props);
+    }
+
+    if (!this.decoratorData[ValidationKeys.REQUIRED]) {
+      zodSchema = zodSchema.optional();
+    }
+
+    if (this.attributeDescription) {
+      zodSchema = zodSchema.describe(this.attributeDescription);
+    }
+
+    return zodSchema;
+  }
+}
+
+class ZodModelBuilder<
+  M extends Model,
+  META extends ExtendedMetadata<M>,
+> extends ModelBuilder<M> {
+  constructor(
+    private readonly target: Constructor<M>,
+    private readonly metadata: META
+  ) {
+    super();
+  }
+
+  private decoratorDataFor(prop: keyof M) {
+    const validations =
+      ((this.metadata.validation as Record<keyof M, DecoratorData>) ??
+        ({} as Record<keyof M, DecoratorData>))[prop] ?? {};
+    const decoratorData: DecoratorData = { ...validations };
+
+    if (!decoratorData[ValidationKeys.TYPE]) {
+      const designType = (
+        this.metadata.properties as
+          | Record<string, Constructor | { name?: string }>
+          | undefined
+      )?.[prop as string];
+      const typeName =
+        typeof designType === "function"
+          ? designType.name
+          : typeof designType?.name === "string"
+            ? designType.name
+            : undefined;
+      if (typeName) {
+        decoratorData[ValidationKeys.TYPE] = {
+          customTypes: [typeName],
+          message: DEFAULT_ERROR_MESSAGES.TYPE,
+          description: "defines the accepted types for the attribute",
+        } as unknown as TypeMetadata;
+      }
+    }
+
+    return decoratorData;
+  }
+
+  toZodObject() {
+    const result: Record<string, any> = {};
+    const properties = Model.getAttributes(this.target);
+    if (Array.isArray(properties) && properties.length) {
+      for (const prop of properties) {
+        if (
+          typeof prop !== "string" ||
+          prop === "constructor" ||
+          prop.startsWith("_")
+        ) {
+          continue;
+        }
+
+        if (typeof (this.target as any)[prop] === "function") {
+          continue;
+        }
+
+        const decoratorData = this.decoratorDataFor(prop as keyof M);
+        if (!Object.keys(decoratorData).length) continue;
+
+        const attributeBuilder = new ZodAttributeBuilder(
+          this as ModelBuilder<M>,
+          prop as keyof M,
+          (this.metadata.properties as Record<string, Constructor>)?.[
+            prop as string
+          ],
+          decoratorData,
+          Metadata.description(this.target as any, prop as any) ??
+            (this.metadata.description as Record<string, string> | undefined)?.[
+              prop as string
+            ]
+        );
+        const schema = attributeBuilder.buildSchema();
+        if (schema) {
+          result[prop] = schema;
+        }
+      }
+    }
+
+    const description =
+      Metadata.description(this.target as any) ??
+      (this.metadata.description as Record<string, string> | undefined)?.class;
+    const objectSchema = z.object(result);
+    return description ? objectSchema.describe(description) : objectSchema;
+  }
 }
 
 export function zodify(type: string | string[], zz: any = ZodAny) {
@@ -121,109 +319,18 @@ export function zodifyValidation(
   }
 }
 
-export function modelToZod<M extends Model>(model: M) {
-  const result: { [key: string]: any } = {};
+export function modelToZod<M extends Model, META extends ExtendedMetadata<M>>(
+  model: M | Constructor<M>
+) {
+  const ctor =
+    model instanceof Model ? (model.constructor as Constructor<M>) : model;
+  const fullMeta: META | undefined = Metadata.get(ctor as any) as META;
+  const builder = new ZodModelBuilder(
+    ctor as Constructor<M>,
+    (fullMeta ?? { validation: {}, properties: {}, description: {} }) as META
+  );
 
-  const properties = Model.getAttributes(model);
-  if (Array.isArray(properties) && !properties.length) return z.object({});
-  for (const prop of properties) {
-    if (
-      typeof (model as any)[prop] === "function" ||
-      prop.startsWith("_") ||
-      prop === "constructor"
-    ) {
-      continue;
-    }
-
-    const allDecs = Reflection.getPropertyDecorators(
-      ValidationKeys.REFLECT,
-      model,
-      prop,
-      false,
-      true
-    );
-
-    const decoratorData = allDecs.decorators.reduce(
-      (accum: Record<string, any>, el) => {
-        const { key, props } = el;
-        if (key === ModelKeys.TYPE && !accum[ValidationKeys.TYPE]) {
-          accum[ValidationKeys.TYPE] = {
-            customTypes: [props.name as string],
-            message: DEFAULT_ERROR_MESSAGES.TYPE,
-            description: "defines the accepted types for the attribute",
-          };
-        } else {
-          accum[key] = props;
-        }
-        return accum;
-      },
-      {}
-    );
-
-    if (!Object.keys(decoratorData).length) {
-      continue;
-    }
-
-    let zod: any = ZodAny;
-
-    const typeData: TypeMetadata = decoratorData[
-      ValidationKeys.TYPE
-    ] as TypeMetadata;
-
-    if (!typeData) {
-      throw new Error(`Missing type information`);
-    }
-
-    zod = zodify(
-      (Array.isArray(typeData.customTypes)
-        ? typeData.customTypes
-        : [typeData.customTypes]
-      ).map((c) => {
-        if (typeof c === "function") return c();
-        return c;
-      }),
-      decoratorData[ValidationKeys.LIST]
-        ? zodify(
-            (Array.isArray(
-              (decoratorData[ValidationKeys.LIST] as ListMetadata).clazz
-            )
-              ? (decoratorData[ValidationKeys.LIST] as ListMetadata).clazz
-              : [(decoratorData[ValidationKeys.LIST] as ListMetadata).clazz]
-            ).map((c) => {
-              if (typeof c === "function") {
-                return c().name;
-              }
-              return c as string;
-            })
-          )
-        : ZodAny
-    );
-
-    for (const [key, props] of Object.entries(decoratorData).filter(
-      ([k]) => !isReservedKey(k)
-    )) {
-      zod = zodifyValidation(zod, key, props);
-    }
-
-    if (!decoratorData[ValidationKeys.REQUIRED]) {
-      zod = zod.optional();
-    }
-
-    const description = Metadata.description(
-      model.constructor as any,
-      prop as any
-    );
-
-    if (description) {
-      zod = zod.describe(description);
-    }
-
-    result[prop] = zod;
-  }
-
-  const description = Metadata.description(model.constructor as any);
-  const res = z.object(result);
-  return description ? res.describe(description) : res;
+  return builder.toZodObject();
 }
 
 const descriptor = Object.getOwnPropertyDescriptor(z, "from" as keyof typeof z);
@@ -231,9 +338,7 @@ const descriptor = Object.getOwnPropertyDescriptor(z, "from" as keyof typeof z);
 if (!descriptor || descriptor.configurable) {
   Object.defineProperty(z, "from", {
     value: <M extends Model>(model: Constructor<M>) => {
-      const m = new model();
-      if (!Metadata.constr(m.constructor as any)) Model.fromModel(m, {});
-      return modelToZod(m) as any;
+      return modelToZod(model) as any;
     },
   });
 }
