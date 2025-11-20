@@ -27,7 +27,7 @@ Small addon to enable two-way convertion between Models and Zod
 
 Documentation available [here](https://decaf-ts.github.io/as-zod/)
 
-Minimal size: 1.3 KB kb gzipped
+Minimal size: 1.6 KB kb gzipped
 
 
 ### Description
