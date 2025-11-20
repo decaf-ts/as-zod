@@ -1,4 +1,5 @@
-import type { Constructor, Model } from "@decaf-ts/decorator-validation";
+import type { Model } from "@decaf-ts/decorator-validation";
+import type { Constructor } from "@decaf-ts/decoration";
 import type {
   ZodArray,
   ZodBigInt,

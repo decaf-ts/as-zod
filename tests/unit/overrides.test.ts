@@ -16,9 +16,9 @@ import {
   list,
   minlength,
   maxlength,
+  ExtendedMetadata,
 } from "@decaf-ts/decorator-validation";
-import { description } from "@decaf-ts/decoration";
-import { Reflection } from "@decaf-ts/reflection";
+import { description, Metadata } from "@decaf-ts/decoration";
 import { z } from "zod";
 import { modelToZod, zodify, zodifyValidation } from "../../src/overrides";
 
@@ -69,19 +69,21 @@ describe("zodify", () => {
     );
   });
 
-  it("wraps conversion failures from model instances", () => {
+  it("converts models without instantiating constructors", () => {
+    let constructed = false;
     @model()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     class ExplodingModel extends Model {
       constructor() {
         super();
+        constructed = true;
         throw new Error("Explosion");
       }
     }
 
-    expect(() => zodify("ExplodingModel")).toThrow(
-      /Failed to zodify model ExplodingModel: Error: Explosion/
-    );
+    const schema = zodify("ExplodingModel");
+    expect(schema).toBeInstanceOf(z.ZodObject);
+    expect(constructed).toBe(false);
   });
 });
 
@@ -149,7 +151,7 @@ describe("zodifyValidation", () => {
     const original = z.string();
     const unchanged = zodifyValidation(
       original,
-      "non-existent" as ValidationKeys,
+      "non-existent" as any,
       {} as ValidatorOptions
     );
     expect(unchanged).toBe(original);
@@ -161,7 +163,7 @@ describe("modelToZod", () => {
   @description("Child holder")
   class ChildModel extends Model {
     @required()
-    @type("string")
+    @type(String)
     name!: string;
 
     constructor(arg?: ModelArg<ChildModel>) {
@@ -184,7 +186,7 @@ describe("modelToZod", () => {
 
     @description("optional children")
     @list(() => ChildModel)
-    @type(ChildModel.name)
+    @type(ChildModel)
     children?: ChildModel[];
 
     helper() {
@@ -231,11 +233,11 @@ describe("modelToZod", () => {
     @model()
     class IgnoredPropertyModel extends Model {
       @required()
-      @type("string")
+      @type(String)
       included!: string;
 
       @required()
-      @type("string")
+      @type(String)
       ignored!: string;
 
       constructor(arg?: ModelArg<IgnoredPropertyModel>) {
@@ -243,41 +245,35 @@ describe("modelToZod", () => {
       }
     }
 
-    const original = Reflection.getPropertyDecorators.bind(Reflection);
-    const skipSpy = jest
-      .spyOn(Reflection, "getPropertyDecorators")
-      .mockImplementation(
-        (prefix, target, property, ignoreType, recursive, accumulator) => {
-          if (property === "ignored") {
-            return { prop: "ignored", decorators: [] } as any;
-          }
-          return original(
-            prefix,
-            target,
-            property,
-            ignoreType as boolean | undefined,
-            recursive as boolean | undefined,
-            accumulator
-          );
-        }
-      );
+    const meta = Metadata.get(
+      IgnoredPropertyModel
+    ) as ExtendedMetadata<IgnoredPropertyModel>;
+    const originalValidation = meta.validation.ignored;
+    const originalType = meta.properties.ignored;
+    Metadata.set(IgnoredPropertyModel, "validation.ignored", undefined);
+    Metadata.set(IgnoredPropertyModel, "properties.ignored", undefined);
 
     const schema = modelToZod(new IgnoredPropertyModel());
     expect(schema.shape).toHaveProperty("included");
     expect(schema.shape).not.toHaveProperty("ignored");
 
-    skipSpy.mockRestore();
+    Metadata.set(
+      IgnoredPropertyModel,
+      "validation.ignored",
+      originalValidation
+    );
+    Metadata.set(IgnoredPropertyModel, "properties.ignored", originalType);
   });
 
   it("omits internal fields and fails without type metadata", () => {
     @model()
     class HiddenModel extends Model {
       @required()
-      @type("string")
+      @type(String)
       visible!: string;
 
       @required()
-      @type("string")
+      @type(() => String)
       _hidden!: string;
 
       constructor(arg?: ModelArg<HiddenModel>) {
@@ -299,21 +295,21 @@ describe("modelToZod", () => {
       }
     }
 
-    const reflectionSpy = jest.spyOn(Reflection, "getPropertyDecorators");
-    reflectionSpy.mockReturnValue({
-      prop: "field",
-      decorators: [
-        {
-          key: ValidationKeys.REQUIRED,
-          props: { message: "", async: false },
-        },
-      ],
-    } as any);
+    const meta = Metadata.get(
+      MissingTypeModel
+    ) as ExtendedMetadata<MissingTypeModel>;
+    const originalValidation = meta.validation.field;
+    Metadata.set(MissingTypeModel, "validation.field", {
+      [ValidationKeys.REQUIRED]: originalValidation?.[ValidationKeys.REQUIRED],
+    } as ValidatorOptions);
+    const originalPropertyType = meta.properties.field;
+    Metadata.set(MissingTypeModel, "properties.field", undefined);
 
     expect(() => modelToZod(new MissingTypeModel())).toThrow(
       /Missing type information/
     );
 
-    reflectionSpy.mockRestore();
+    Metadata.set(MissingTypeModel, "validation.field", originalValidation);
+    Metadata.set(MissingTypeModel, "properties.field", originalPropertyType);
   });
 });
