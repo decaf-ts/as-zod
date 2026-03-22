@@ -84,12 +84,7 @@
   "peerDependencies": {
     "@decaf-ts/decoration": "latest",
     "@decaf-ts/decorator-validation": "latest",
-    "@decaf-ts/reflection": "latest",
     "zod": "^4.1.12"
   },
-  "license": "MIT",
-  "overrides": {
-    "minimatch": "^10.2.2",
-    "test-exclude": "7.0.1"
-  }
+  "license": "MIT"
 }
