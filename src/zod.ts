@@ -57,6 +57,9 @@ export type ZodShapeFor<M> = {
 // Public helper for the inferred Zod object type for a Model constructor
 export type ZodFrom<M extends Model> = ZodObject<ZodShapeFor<M>>;
 
+// Public helper for the constructor returned when translating a Zod schema back into a Model
+export type ModelFromZod<S extends ZodTypeAny, M extends Model = Model> = Constructor<M>;
+
 // Utility helpers to explicitly specify element types for collections in TS
 export type ListOf<T> = T[];
 export type SetOf<T> = Set<T>;
@@ -65,5 +68,9 @@ declare module "zod" {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace z {
     function from<M extends Model>(model: Constructor<M>): ZodFrom<M>;
+    function toModel<S extends ZodTypeAny, M extends Model = Model>(
+      schema: S,
+      name?: string
+    ): ModelFromZod<S, M>;
   }
 }

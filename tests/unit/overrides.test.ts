@@ -20,7 +20,14 @@ import {
 } from "@decaf-ts/decorator-validation";
 import { description, Metadata } from "@decaf-ts/decoration";
 import { z } from "zod";
-import { modelToZod, zodify, zodifyValidation } from "../../src/overrides";
+import { modelToZod, zodToModel, zodify, zodifyValidation } from "../../src/overrides";
+
+@model()
+class NamePreservationModel extends Model {
+  constructor(arg?: ModelArg<NamePreservationModel>) {
+    super(arg);
+  }
+}
 
 describe("zodify", () => {
   it("creates schemas for primitives, containers, and unions", () => {
@@ -311,5 +318,68 @@ describe("modelToZod", () => {
 
     Metadata.set(MissingTypeModel, "validation.field", originalValidation);
     Metadata.set(MissingTypeModel, "properties.field", originalPropertyType);
+  });
+});
+
+describe("zodToModel", () => {
+  it("builds models from zod schemas", () => {
+    const source = z
+      .object({
+        name: z.string().min(2).max(6),
+        role: z.enum(["admin", "user"]),
+        maybe: z.string().nullable(),
+        count: z.number().int(),
+        tags: z.array(z.string()).min(1).max(2),
+        child: z.object({
+          id: z.string(),
+        }),
+      })
+      .describe("Round trip model");
+
+    const RoundTripModel = z.toModel(source, "RoundTripModel");
+    expect(RoundTripModel.name).toBe("RoundTripModel");
+
+    const roundTrip = z.from(RoundTripModel);
+    expect(roundTrip.description).toBe("Round trip model");
+    expect(roundTrip.shape.role).toBeInstanceOf(z.ZodEnum);
+
+    expect(
+      roundTrip.safeParse({
+        name: "Alice",
+        role: "admin",
+        maybe: "x",
+        count: 2,
+        tags: ["a"],
+        child: { id: "x" },
+      }).success
+    ).toBe(true);
+
+    expect(
+      roundTrip.safeParse({
+        name: "A",
+        role: "admin",
+        maybe: null,
+        count: 2,
+        tags: ["a"],
+        child: { id: "x" },
+      }).success
+    ).toBe(false);
+
+    expect(
+      roundTrip.safeParse({
+        name: "Alice",
+        role: "admin",
+        maybe: "x",
+        count: 2,
+        tags: ["a", "b", "c"],
+        child: { id: "x" },
+      }).success
+    ).toBe(false);
+  });
+
+  it("restores the original model name when the schema came from z.from", () => {
+    const source = z.from(NamePreservationModel);
+    const rebuilt = z.toModel(source);
+    expect(rebuilt.name).toBe("NamePreservationModel");
   });
 });
