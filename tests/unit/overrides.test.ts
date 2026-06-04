@@ -20,7 +20,7 @@ import {
 } from "@decaf-ts/decorator-validation";
 import { description, Metadata } from "@decaf-ts/decoration";
 import { z } from "zod";
-import { modelToZod, zodToModel, zodify, zodifyValidation } from "../../src/overrides";
+import { modelToZod, zodify, zodifyValidation } from "../../src/overrides";
 
 @model()
 class NamePreservationModel extends Model {

@@ -58,7 +58,10 @@ type BuildableModel = Model & Record<PropertyKey, any>;
 
 const AS_ZOD_MODEL_NAME = "__decafModelName";
 
-type TypeRef = Constructor | (() => Constructor) | (Constructor | (() => Constructor))[];
+type TypeRef =
+  | Constructor
+  | (() => Constructor)
+  | (Constructor | (() => Constructor))[];
 
 interface BuildState<T extends Model = Model> {
   ctor?: Constructor<T>;
@@ -213,7 +216,11 @@ function checkDef(check: any) {
   return check?._zod?.def ?? check?.def ?? check;
 }
 
-function ensureCtorName(schema: ZodTypeAny, fallback: string, explicit?: string) {
+function ensureCtorName(
+  schema: ZodTypeAny,
+  fallback: string,
+  explicit?: string
+) {
   return sanitizeClassName(
     explicit ??
       schemaModelName(schema) ??
@@ -225,7 +232,9 @@ function ensureCtorName(schema: ZodTypeAny, fallback: string, explicit?: string)
 
 function modelNameForPath(path: string[], fallback: string) {
   if (!path.length) return fallback;
-  return sanitizeClassName(path.map((part) => part.replace(/[^a-zA-Z0-9]/g, " ")).join(" "));
+  return sanitizeClassName(
+    path.map((part) => part.replace(/[^a-zA-Z0-9]/g, " ")).join(" ")
+  );
 }
 
 class ZodAttributeBuilder<
@@ -852,13 +861,10 @@ function buildModelFromSchema(
   }
 
   for (const [prop, propSchema] of Object.entries(schema.shape)) {
-    applySchemaToAttribute(
-      builder,
+    applySchemaToAttribute(builder, prop, propSchema as ZodTypeAny, ctx, [
+      ...path,
       prop,
-      propSchema as ZodTypeAny,
-      ctx,
-      [...path, prop]
-    );
+    ]);
   }
 
   const ctor = builder.build();
@@ -869,7 +875,10 @@ function buildModelFromSchema(
   return ctor;
 }
 
-export function zodToModel<M extends Model>(schema: ZodTypeAny, name?: string) {
+export function zodToModel<M extends Model>(
+  schema: ZodTypeAny,
+  name?: string
+): Constructor<M> {
   if (!(schema instanceof ZodObject)) {
     throw new Error(
       `Zod-to-Model conversion requires a ZodObject at the root, received ${schema.constructor.name}`

@@ -58,7 +58,12 @@ export type ZodShapeFor<M> = {
 export type ZodFrom<M extends Model> = ZodObject<ZodShapeFor<M>>;
 
 // Public helper for the constructor returned when translating a Zod schema back into a Model
-export type ModelFromZod<S extends ZodTypeAny, M extends Model = Model> = Constructor<M>;
+
+export type ModelFromZod<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  S extends ZodTypeAny,
+  M extends Model = Model,
+> = Constructor<M>;
 
 // Utility helpers to explicitly specify element types for collections in TS
 export type ListOf<T> = T[];
