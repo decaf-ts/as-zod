@@ -1,4 +1,3 @@
-import "../../src";
 import {
   date as dateDecorator,
   email,
@@ -19,7 +18,7 @@ import {
   url,
 } from "@decaf-ts/decorator-validation";
 import { description } from "@decaf-ts/decoration";
-import { z } from "zod";
+import { z } from "../../src";
 
 @model()
 @description("Complex decorated model")

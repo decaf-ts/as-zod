@@ -472,7 +472,7 @@ export function zodify(type: string | string[], zz: any = ZodAny) {
           throw new Error(`Unzodifiable type: ${type}`);
         }
         try {
-          const zz = z.from(m);
+          const zz = modelToZod(m);
           return zz;
         } catch (e: unknown) {
           throw new Error(`Failed to zodify model ${type}: ${e}`);
@@ -893,40 +893,11 @@ export function zodToModel<M extends Model>(
   return buildModelFromSchema(schema, ctx, explicitName);
 }
 
-// Convenience wrappers that work regardless of whether `z` is extensible
+// Convenience wrappers, also exposed as `z.from` / `z.toModel` via the package's `z` namespace
 export function zFrom<M extends Model>(model: Constructor<M>) {
   return modelToZod(model) as any;
 }
 
 export function zToModel<M extends Model>(schema: ZodTypeAny, name?: string) {
   return zodToModel<M>(schema, name) as any;
-}
-
-// Attach `from` and `toModel` to the `z` namespace when possible.
-// In zod v4+ the `z` export is sealed (non-extensible), so we guard against
-// both non-configurable and non-extensible targets to avoid runtime errors.
-const descriptor = Object.getOwnPropertyDescriptor(z, "from" as keyof typeof z);
-const canDefineFrom = (!descriptor || descriptor.configurable) && Object.isExtensible(z);
-
-if (canDefineFrom) {
-  Object.defineProperty(z, "from", {
-    value: zFrom,
-    configurable: true,
-    writable: true,
-  });
-}
-
-const toModelDescriptor = Object.getOwnPropertyDescriptor(
-  z,
-  "toModel" as keyof typeof z
-);
-const canDefineToModel =
-  (!toModelDescriptor || toModelDescriptor.configurable) && Object.isExtensible(z);
-
-if (canDefineToModel) {
-  Object.defineProperty(z, "toModel", {
-    value: zToModel,
-    configurable: true,
-    writable: true,
-  });
 }

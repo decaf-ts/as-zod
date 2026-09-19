@@ -1,4 +1,3 @@
-import "../../src";
 import {
   MaxLengthValidatorOptions,
   MaxValidatorOptions,
@@ -19,7 +18,7 @@ import {
   ExtendedMetadata,
 } from "@decaf-ts/decorator-validation";
 import { description, Metadata } from "@decaf-ts/decoration";
-import { z } from "zod";
+import { z } from "../../src";
 import { modelToZod, zodify, zodifyValidation } from "../../src/overrides";
 
 @model()

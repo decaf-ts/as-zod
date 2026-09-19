@@ -68,14 +68,3 @@ export type ModelFromZod<
 // Utility helpers to explicitly specify element types for collections in TS
 export type ListOf<T> = T[];
 export type SetOf<T> = Set<T>;
-
-declare module "zod" {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace z {
-    function from<M extends Model>(model: Constructor<M>): ZodFrom<M>;
-    function toModel<S extends ZodTypeAny, M extends Model = Model>(
-      schema: S,
-      name?: string
-    ): ModelFromZod<S, M>;
-  }
-}

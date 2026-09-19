@@ -2,6 +2,7 @@ import { Metadata } from "@decaf-ts/decoration";
 
 export * from "./zod";
 export * from "./overrides";
+export * as z from "./z";
 
 /**
  * @description Current version of the reflection package

@@ -1,4 +1,3 @@
-import "../../src";
 import {
   maxlength,
   minlength,
@@ -12,7 +11,7 @@ import {
   list,
 } from "@decaf-ts/decorator-validation";
 import { description } from "@decaf-ts/decoration";
-import { z } from "zod";
+import { z } from "../../src";
 
 @model()
 class InnerTestModel extends Model {
