@@ -475,7 +475,7 @@ export function zodify(type: string | string[], zz: any = ZodAny) {
           const zz = modelToZod(m);
           return zz;
         } catch (e: unknown) {
-          throw new Error(`Failed to zodify model ${type}: ${e}`);
+          throw new Error(`Failed to zodify model ${type}: ${e}`, { cause: e });
         }
       }
     }

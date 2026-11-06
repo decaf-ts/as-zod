@@ -1,3 +1,4 @@
+import { it } from "@decaf-ts/for-testing";
 import {
   maxlength,
   minlength,
@@ -22,7 +23,7 @@ class InnerTestModel extends Model {
 
 @model()
 class TestModel extends Model {
-  @type(InnerTestModel.name)
+  @type(InnerTestModel)
   prop?: InnerTestModel;
 
   constructor(arg?: ModelArg<TestModel>) {
