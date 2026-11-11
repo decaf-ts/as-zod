@@ -1,6 +1,6 @@
 {
   "name": "@decaf-ts/as-zod",
-  "version": "1.17.0",
+  "version": "1.17.1",
   "description": "Zod compatibility library",
   "type": "module",
   "exports": {
